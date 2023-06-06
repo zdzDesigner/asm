@@ -1,0 +1,15 @@
+task("quiet", function()
+  on_run(function()
+    os.exec("bochs -q")
+  end)
+end)
+
+target("compile", function()
+  set_kind("binary")
+  add_files("./hello.asm")
+
+  after_build(function(target)
+    os.exec("dd if=hello.bin of=master.img bs=512 count=1 conv=notrunc")
+    -- task.run("quiet")
+  end)
+end)
