@@ -19,3 +19,6 @@ bochs -q
 ```
 
 
+
+## xmake 
+xmake run
