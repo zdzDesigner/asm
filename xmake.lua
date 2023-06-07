@@ -1,36 +1,23 @@
 add_rules("mode.debug")
 
 
-target("hello", function()
-  set_default(false)
-  add_files("./*.asm")
-  on_load(function(target)
-    print("name: %s", target:name())
-    -- os.exec("nasm ./*.asm -o ./*.bin")
-    -- os.exec("dd if=hello.bin of=master.img bs=512 count=1 conv=notrunc")
-    -- os.exec("bochs -q")
+
+
+rule("compile", function()
+  on_build(function(target)
+    local sourcefiles = target:sourcebatches()["asm.build"]["sourcefiles"]
+    -- print(target:scriptdir()) -- 目录
+    for _, value in ipairs(sourcefiles) do
+      os.exec("nasm ./%s -o ./%s.bin", value, value)
+    end
   end)
 end)
 
+target("build", function()
+  add_rules("compile")
 
--- target("hello", function()
---   set_default(false)
---   on_build(function(target)
---     print("name: %s", target:name())
---     os.exec("nasm ./hello.asm -o ./hello.bin")
---     os.exec("dd if=hello.bin of=master.img bs=512 count=1 conv=notrunc")
---     os.exec("bochs -q")
---   end)
--- end)
-
-
-
-
-
-
-
-
-
-
-
-
+  add_files("./*.asm", { rule = "compile" })
+  on_run(function()
+    os.exec("bochs -q")
+  end)
+end)
